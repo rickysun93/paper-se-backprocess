@@ -21,5 +21,11 @@ def search():
         return jsonify(paperservice.papersearch(query, region))
 
 
+@app.route('/searchid')
+def searchid():
+    query = request.args.get('query', '')
+    return jsonify(paperservice.paperidsearch(query))
+
+
 if __name__ == '__main__':
     app.run()

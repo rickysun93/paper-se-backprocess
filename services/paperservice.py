@@ -32,3 +32,34 @@ def papersearch(query, region):
     for paper in newpapers:
         result['hits']['hits'].append(response.json()['hits']['hits'][paper])
     return result
+
+
+def paperidsearch(query):
+    params = {'query': {}}
+    params['query']['query_string'] = {'query': query, 'fields': ['paperid']}
+    headers = {'content-type': 'application/json'}
+    response = requests.request('POST', utils.searchAllUrl, data=json.dumps(params), headers=headers)
+
+    topic = utils.doc_topic[utils.ids.index(query)]
+    topicp = utils.doc_topics[utils.ids.index(query)]
+    topics = []
+    for i in np.argsort(topicp)[:-6:-1]:
+        topics.append({
+            'topic': int(i),
+            'p': topicp[i]
+        })
+    wordsid = utils.topic_word[topic]
+    words = []
+    wordss = []
+    for t in topics:
+        words = []
+        wordsid = utils.topic_word[t['topic']]
+        for wid in np.argsort(wordsid)[:-21:-1]:
+            words.append(utils.vocab[wid])
+        wordss.append(words)
+    result = {
+        'paper': response.json()['hits']['hits'][0],
+        'topics': topics,
+        'words': wordss
+    }
+    return result
